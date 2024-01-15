@@ -1,0 +1,18 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+  <div class="container mt-5 text-center">
+    <div class="card shadow">
+      <div class="card-body">
+        <h2 class="card-title text-danger mb-4">Confirm Task Deletion</h2>
+        <p class="card-text mb-4">Are you sure you want to delete the task named <strong>"{{ task.name }}"</strong>?</p>
+        
+        <form method="post" action="{% url 'todo:delete' task.id %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger me-5">Delete</button>
+          <a href="{% url 'todo:tasks' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}

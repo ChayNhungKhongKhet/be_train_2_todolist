@@ -1,0 +1,40 @@
+{% extends "layout.html" %} {% block styles %}
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .error-container {
+        text-align: center;
+        padding: 100px 15px;
+    }
+
+    .error-heading {
+        font-size: 72px;
+        color: #dc3545;
+    }
+
+    .error-message {
+        font-size: 24px;
+        color: #007bff;
+    }
+
+    .back-home-btn {
+        margin-top: 20px;
+    }
+</style>
+{% endblock %} {% block content %}
+<div class="container">
+    <div class="error-container">
+        <h1 class="error-heading">400</h1>
+        <p class="error-message">Bad Request.Something went wrong with your request.</p>
+        <a href="/" class="btn btn-primary back-home-btn">Back to Home</a>
+    </div>
+</div>
+{% endblock %} {% block scripts %}
+<script
+  src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"
+  integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+  crossorigin="anonymous"
+></script>
+{% endblock %}
