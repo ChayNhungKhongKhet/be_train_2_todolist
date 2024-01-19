@@ -81,9 +81,9 @@
                                 <span class="badge bg-success">Completed</span>
                             {% endif %}
                         </p>
-                        <small class="text-muted">Start Date: {{ task.start_date|date:"M j Y, g:i A" }}</small>
+                        <small class="text-muted">Start Date: {{ task.start_date|date:"Y-m-d H:i" }}</small>
                         <br/>
-                        <small class="text-muted">End Date: {{ task.end_date|date:"M j Y, g:i A" }}</small>
+                        <small class="text-muted">End Date: {{ task.end_date|date:"Y-m-d H:i" }}</small>
                     </div>
                     <div>
                         <button class="btn btn-danger btn-sm me-2 delete-task"
@@ -156,6 +156,7 @@
     {% endif %}
 {% endblock %}
 {% block scripts %}
+
     <script>
         $(document).ready(function () {
 
@@ -197,7 +198,7 @@
         });
 
         function fillForm(taskId) {
-
+            clearForm();
             $.ajax({
                 type: 'GET',
                 url: '{% url 'todo:update' 0 %}'.replace('0', taskId),
@@ -208,17 +209,20 @@
                         var element = $('#' + key);
 
                         // Check if the element exists in the form
-                        if (element.length) {
-                            if (element.is('[type="datetime-local"]')) {
-                                // Format the date string for datetime-local input
-                                var formattedDate = value.slice(0, 16); // Extract "yyyy-MM-ddThh:mm"
-                                element.attr('value', formattedDate);
-                            } else {
-                                // Set the value for other input types
-                                element.attr('value', value);
-                            }
-                            console.log(element, value)
+
+                        if (element.is('[type="datetime-local"]')) {
+                            // Format the date string for datetime-local input
+                            var formattedDate = value.slice(0, 16); // Extract "yyyy-MM-ddThh:mm"
+                            element.val(formattedDate);
+
+                        } else if (element.is('select')) {
+                            // Set the value for other input types
+                            element.find(`option[value=${value}]`).prop('selected', true);
+                        } else {
+                            element.attr('value', value)
                         }
+                        console.log(key, value)
+
                     });
                     $('#form').attr('action', '{% url 'todo:update' 0 %}'.replace('0', taskId))
                 }
@@ -344,18 +348,18 @@
                 handleEditTask($(this));
             });
             clearForm();
+            setDefaultStartDate();
         }
 
         function clearForm() {
             // Use jQuery to select and clear the form input values
             $('#taskName').val('');
-            $('#taskStatus').val('1'); // Set the default status value (To do)
-            setDefaultStartDate();
+            $('#taskStatus').find('option[value=1]').prop('selected', true); // Set the default status value (To do)
             $('#taskEndDate').val('');
+            $('#taskStartDate').val('');
         }
 
         function createTaskItem(task) {
-
 
             var taskList = $('ul.list-group');
             var newTaskItem = $('<li></li>').addClass('list-group-item d-flex justify-content-between align-items-center').attr('task-id', task.id);
@@ -372,9 +376,7 @@
             <button type="button" class="btn btn-primary btn-sm edit-task" data-bs-toggle="modal" data-bs-target="#editModal" data-task-id="${task.id}">Edit</button>
         </div>
     `);
-
             newTaskItem.appendTo(taskList);
-
         }
 
 
@@ -462,18 +464,9 @@
         }
 
         function formatDateTime(dateTimeString) {
-            var options = {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: 'numeric',
-                minute: 'numeric',
-                hour12: true,
-            };
-
-            var formattedDate = new Date(dateTimeString).toLocaleDateString('en-US', options);
-            return formattedDate.replace(',', ''); // Remove the comma after the day
+            return dateTimeString.slice(0, 16).replace('T', ' ');
         }
+
 
         function getStatusLabel(status) {
             let result;
