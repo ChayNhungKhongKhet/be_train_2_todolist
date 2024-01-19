@@ -2,340 +2,489 @@
 
 {% block content %}
     <!-- Create Button -->
-    
+    <div class="mb-2">
+        <form id="searchForm" method="get" action="{% url 'todo:tasks' %}">
+            {% csrf_token %}
+            <div class="input-group">
+                <input type="text" name="q" id="searchInput" class="form-control" placeholder="Search tasks">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Search
+                </button>
+            </div>
+        </form>
+    </div>
     <div class="mb-4">
-      <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createTaskModal">
-        <i class="fas fa-plus"></i> Add Task
-      </button>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createTaskModal">
+            <i class="fas fa-plus"></i> Add Task
+        </button>
     </div>
 
     <!-- Task Creation Modal -->
-    <div class="modal fade" id="createTaskModal" tabindex="-1" aria-labelledby="createTaskModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="createTaskModalLabel">Create New Task</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <!-- Task Creation Form -->
-            <form action="{% url 'todo:create' %}" method="POST" id="form_create">
-              {% csrf_token %}
-              <!-- Include your form fields for task creation here -->
-              <div class="mb-2">
-                <label for="taskName">Task Name:</label>
-                <input type="text" name="name" id="taskName" class="form-control" placeholder="Task Name" required>
-              </div>
-              <div class="mb-2">
-                <label for="taskStatus">Status:</label>
-                <select name="status" id="taskStatus" class="form-select" required>
-                  <option value="1">To do</option>
-                  <option value="2">In Progress</option>
-                  <option value="3">Completed</option>
-                </select>
-              </div>
-              <div class="mb-2">
-                <label for="taskStartDate">Start Date:</label>
-                <input type="datetime-local" name="start_date" id="taskStartDate" class="form-control" placeholder="Start Date" required>
-              </div>
-              <div class="mb-2">
-                <label for="taskEndDate">End Date:</label>
-                <input type="datetime-local" name="end_date" id="taskEndDate" class="form-control" placeholder="End Date" required>
-              </div>
-              <button type="submit" class="btn btn-primary">Create Task</button>
-            </form>
-          </div>
+    <div class="modal fade" id="createTaskModal" tabindex="-1" aria-labelledby="createTaskModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createTaskModalLabel">Create New Task</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Task Creation Form -->
+                    <form action="{% url 'todo:create' %}" method="POST" id="form_create">
+                        {% csrf_token %}
+                        <!-- Include your form fields for task creation here -->
+                        <div class="mb-2">
+                            <label for="taskName">Task Name:</label>
+                            <input type="text" name="name" id="taskName" class="form-control" placeholder="Task Name"
+                                   required>
+                        </div>
+                        <div class="mb-2">
+                            <label for="taskStatus">Status:</label>
+                            <select name="status" id="taskStatus" class="form-select" required>
+                                <option value="1">To do</option>
+                                <option value="2">In Progress</option>
+                                <option value="3">Completed</option>
+                            </select>
+                        </div>
+                        <div class="mb-2">
+                            <label for="taskStartDate">Start Date:</label>
+                            <input type="datetime-local" name="start_date" id="taskStartDate" class="form-control"
+                                   placeholder="Start Date" required>
+                        </div>
+                        <div class="mb-2">
+                            <label for="taskEndDate">End Date:</label>
+                            <input type="datetime-local" name="end_date" id="taskEndDate" class="form-control"
+                                   placeholder="End Date" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Create Task</button>
+                    </form>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 
     {% if tasks %}
-    <ul class="list-group" style="max-height: 450px; overflow-y: auto;">
-      {% for task in tasks %}
-      <li
-        class="list-group-item d-flex justify-content-between align-items-center"
-        task-id="{{ task.id }}"
-      >
-        <div>
-          <h5 class="mb-1">{{ task.name }}</h5>
-          <p class="mb-1">
-            {% if task.status == 1 %}
-            <span class="badge bg-primary">To do</span>
-            {% elif task.status == 2 %}
-            <span class="badge bg-warning">In Progress</span>
-            {% elif task.status == 3 %}
-            <span class="badge bg-success">Completed</span>
-            {% endif %}
-          </p>
-          <small class="text-muted">Start Date: {{ task.start_date|date:"M j Y, g:i A" }}</small>
-          <br />
-          <small class="text-muted">End Date: {{ task.end_date|date:"M j Y, g:i A" }}</small>
-        </div>
-        <div>
-          <a href="#" class="btn btn-danger btn-sm me-2 delete-task" data-task-id="{{ task.id }}">Delete</a>
-          <button
-            type="button"
-            class="btn btn-primary btn-sm"
-            data-bs-toggle="modal"
-            data-bs-target="#editModal{{ task.id }}"
-          >
-            Edit
-          </button>
-        </div>
-      </li>
+        <ul class="list-group" style="max-height: 450px; overflow-y: auto;">
+            {% for task in tasks %}
+                <li
+                        class="list-group-item d-flex justify-content-between align-items-center"
+                        task-id="{{ task.id }}"
+                >
+                    <div>
+                        <h5 class="mb-1">{{ task.name }}</h5>
+                        <p class="mb-1">
+                            {% if task.status == 1 %}
+                                <span class="badge bg-primary">To do</span>
+                            {% elif task.status == 2 %}
+                                <span class="badge bg-warning">In Progress</span>
+                            {% elif task.status == 3 %}
+                                <span class="badge bg-success">Completed</span>
+                            {% endif %}
+                        </p>
+                        <small class="text-muted">Start Date: {{ task.start_date|date:"M j Y, g:i A" }}</small>
+                        <br/>
+                        <small class="text-muted">End Date: {{ task.end_date|date:"M j Y, g:i A" }}</small>
+                    </div>
+                    <div>
+                        <button class="btn btn-danger btn-sm me-2 delete-task"
+                                data-task-id="{{ task.id }}">Delete
+                        </button>
+                        <button
+                                type="button"
+                                class="btn btn-primary btn-sm edit-task"
+                                data-bs-toggle="modal"
+                                data-bs-target="#editModal"
+                                data-task-id="{{ task.id }}"
+                        >
+                            Edit
+                        </button>
+                    </div>
+                </li>
 
-      <!-- Edit Modal -->
-      <div class="modal fade" id="editModal{{ task.id }}" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="editModalLabel">Edit Task</h5>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            {% endfor %}
+        </ul>
+
+        <!-- Edit Modal -->
+        <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel">Edit Task</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Your edit form goes here -->
+                        <form action="" id="form" method="POST">
+                            {% csrf_token %}
+                            <!-- Include your form fields for editing here -->
+                            <!-- For example: -->
+                            <label for="name">Name:</label>
+                            <input type="text" id="name" name="name" value=""
+                                   class="form-control" required>
+
+                            <label for="start_date">Start Date:</label>
+                            <input type="datetime-local" id="start_date" name="start_date"
+                                   value="" class="form-control"
+                                   required>
+
+                            <label for="end_date">End Date:</label>
+                            <input type="datetime-local" id="end_date" name="end_date"
+                                   value="" class="form-control" required>
+
+                            <label for="status">Status:</label>
+                            <select id="status" name="status" class="form-select" required>
+                                <option value="1">To do</option>
+                                <option value="2">In Progress
+                                </option>
+                                <option value="3">Completed
+                                </option>
+                            </select>
+
+                            <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <div class="modal-body">
-              <!-- Your edit form goes here -->
-              <form action="{% url 'todo:update' task.id %}" class="form" method="POST">
-                {% csrf_token %}
-                <!-- Include your form fields for editing here -->
-                <!-- For example: -->
-                <label for="editName">Name:</label>
-                <input type="text" id="editName" name="name" value="{{ task.name }}" class="form-control" required>
-
-                <label for="editStartDate">Start Date:</label>
-                <input type="datetime-local" id="editStartDate" name="start_date" value="{{ task.start_date|date:'Y-m-d\TH:i' }}" class="form-control" required>
-
-                <label for="editEndDate">End Date:</label>
-                <input type="datetime-local" id="editEndDate" name="end_date" value="{{ task.end_date|date:'Y-m-d\TH:i' }}" class="form-control" required>
-
-                <label for="editStatus">Status:</label>
-                <select id="editStatus" name="status" class="form-select" required>
-                    <option value="1" {% if task.status == 1 %}selected{% endif %}>To do</option>
-                    <option value="2" {% if task.status == 2 %}selected{% endif %}>In Progress</option>
-                    <option value="3" {% if task.status == 3 %}selected{% endif %}>Completed</option>
-                </select>
-
-                <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
-              </form>
-            </div>
-          </div>
         </div>
-      </div>
-      <!-- End Edit Modal -->
-
-      {% endfor %}
-    </ul>
+        <!-- End Edit Modal -->
     {% else %}
-    <div class="text-center">
-      <p>No tasks available.</p>
-    </div>
+        <div class="text-center">
+            <p>No tasks available.</p>
+        </div>
     {% endif %}
 {% endblock %}
 {% block scripts %}
-<script>
-  $(document).ready(function () {
+    <script>
+        $(document).ready(function () {
 
-    $('#createTaskModal').on('show.bs.modal', setDefaultStartDate );
 
-    // Handle delete button click
-    $('.delete-task').click(function (e) {
-      e.preventDefault();
-      handleDeleteTask($(this).data('task-id'));
-    });
+            var searchTimeout;
+            // Handle input event on the search input
+            $('#searchInput').on('input', function () {
+                // Clear any existing timeout
+                clearTimeout(searchTimeout);
 
-    $('.form').on('submit', function(event) {
-      event.preventDefault();
-      handleEditTask($(this));
-    });
-    $('#form_create').on('submit', function(event) {
-      event.preventDefault();
-      handleCreateTask($(this));
-    });
-  });
-  function setDefaultStartDate() {
-      // Get the current date and time
-      var now = new Date();
+                // Set a timeout to trigger the search after 500 milliseconds
+                searchTimeout = setTimeout(function () {
+                    performSearch();
+                }, 300);
+            });
 
-      // Get the time zone offset in minutes
-      var timeZoneOffset = now.getTimezoneOffset();
 
-      // Calculate the adjusted date and time
-      var adjustedDate = new Date(now.getTime() - timeZoneOffset * 60000);
+            $('#createTaskModal').on('show.bs.modal', setDefaultStartDate);
 
-      // Format the adjusted date and time to match the input format
-      var formattedDate = adjustedDate.toISOString().slice(0, 16);
+            // Handle delete button click
+            $('.delete-task').on('click', function (e) {
+                e.preventDefault();
+                handleDeleteTask($(this).data('task-id'));
+            });
 
-      // Set the default value for start_date to the adjusted date and time
-      $('#taskStartDate').val(formattedDate);
-  }
+            $('.edit-task').on('click', function (event) {
+                event.preventDefault()
+                fillForm($(this).data('task-id'))
+            })
 
-  function handleCreateTask(form) {
-    $.ajax({
-      url: form.attr('action'),
-      type: form.attr('method'),
-      data: form.serialize(),
-      success: function(data) {
-        handleCreateTaskSuccess(data);
-        for (const key in data) {
-          if (data.hasOwnProperty.call(data, key)) {
-            const element = data[key];
-            console.log(element);
-          }
+            $('#form').on('submit', function (event) {
+                event.preventDefault();
+                handleEditTask($(this));
+            });
+            $('#form_create').on('submit', function (event) {
+                event.preventDefault();
+                handleCreateTask($(this));
+            });
+        });
+
+        function fillForm(taskId) {
+
+            $.ajax({
+                type: 'GET',
+                url: '{% url 'todo:update' 0 %}'.replace('0', taskId),
+                dataType: 'json',
+                success: function (data) {
+                    $.each(data.data, function (key, value) {
+                        // Use the key to find the corresponding form element by ID
+                        var element = $('#' + key);
+
+                        // Check if the element exists in the form
+                        if (element.length) {
+                            if (element.is('[type="datetime-local"]')) {
+                                // Format the date string for datetime-local input
+                                var formattedDate = value.slice(0, 16); // Extract "yyyy-MM-ddThh:mm"
+                                element.attr('value', formattedDate);
+                            } else {
+                                // Set the value for other input types
+                                element.attr('value', value);
+                            }
+                            console.log(element, value)
+                        }
+                    });
+                    $('#form').attr('action', '{% url 'todo:update' 0 %}'.replace('0', taskId))
+                }
+            })
         }
-      },
-      error: function(data) {
-        let errors = data.responseJSON.errors;
-        let result = ''; // Initialize result as an empty string
 
-        for (const key in errors) {
-            result = result.concat(`${errors[key]}\n`);
+        function performSearch() {
+            var searchQuery = $('#searchInput').val().trim();
+
+            // Make an Ajax request to perform the search using POST method
+            $.ajax({
+                type: 'GET',
+                url: '{% url "todo:tasks" %}',
+                data: {'search_query': searchQuery, 'csrfmiddlewaretoken': '{{ csrf_token }}'},
+                dataType: 'json',
+                success: function (data) {
+                    updateTaskList(data.data)
+                },
+                error: function (error) {
+                    console.log(error);
+                },
+            });
         }
 
-        alert(result);
-      }
-    });
-  }
+        function updateTaskList(tasks) {
 
-  function handleCreateTaskSuccess(data) {
-    alert('Created task successfully');
-    createTaskItem(data.data);
-    clearForm();
-  }
+            $('.delete-task').off()
+            $('.edit-task').off()
+            $('#form').off()
+            // Get the task list container
+            var taskList = $('ul.list-group');
 
-  function clearForm() {
-      // Use jQuery to select and clear the form input values
-      $('#taskName').val('');
-      $('#taskStatus').val('1'); // Set the default status value (To do)
-      setDefaultStartDate();
-      $('#taskEndDate').val('');
-    }
+            // Clear the existing task list
+            taskList.empty();
 
-    function createTaskItem(data) {
-      // Get the task list container
-      var taskList = $('ul.list-group');
+            // Check if there are tasks to display
+            if (tasks.length > 0) {
+                // Loop through the tasks and create/update the corresponding list items
+                tasks.forEach(function (task) {
+                    createTaskItem(task);
+                });
+            } else {
+                // If no tasks are found, display a message
+                taskList.append('<li class="list-group-item text-center">No tasks found.</li>');
+            }
 
-      // Create a new <li> element for the task
-      var newTaskItem = $('<li></li>').addClass('list-group-item d-flex justify-content-between align-items-center')
-        .attr('task-id', data.id);
+            $('.delete-task').on('click', function (e) {
+                e.preventDefault();
+                handleDeleteTask($(this).data('task-id'));
+            });
+            $('.edit-task').on('click', function (event) {
+                event.preventDefault();
+                fillForm($(this).data('task-id'))
+            })
 
-      // Append the task details to the <li> element
-      newTaskItem.append('<div><h5 class="mb-1">' + data.name + '</h5><p class="mb-1"><span class="badge bg-' + getStatusBadgeColor(data.status) + '">' + getStatusLabel(data.status) + '</span></p><small class="text-muted">Start Date: ' + formatDateTime(data.start_date) + '</small><br /><small class="text-muted">End Date: ' + formatDateTime(data.end_date) + '</small></div><div><a href="#" class="btn btn-danger btn-sm me-2 delete-task" data-task-id="' + data.id + '">Delete</a><button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#editModal' + data.id + '">Edit</button></div>');
-
-      // Append the new <li> element to the task list
-      taskList.append(newTaskItem);
-
-      // Optionally, you can also handle the modal creation and other actions related to the new task here
-    }
-
-    
-  function handleDeleteTask(taskId) {
-    // Show confirmation dialog
-    if (confirm('Are you sure you want to delete this task?')) {
-      // If user confirms, send Ajax request to delete the task
-      $.ajax({
-        type: 'POST',
-        url: '{% url "todo:delete" 0 %}'.replace('0', taskId), 
-        data: {
-          csrfmiddlewaretoken: '{{ csrf_token }}'
-        },
-        success: function (data) {
-          handleDeleteTaskSuccess(taskId);
-        },
-        error: function (data) {
-          let errors = data.responseJSON.errors;
-          let result = ''; // Initialize result as an empty string
-
-          for (const key in errors) {
-              result = result.concat(`${errors[key]}\n`);
-          }
-          alert(result);
-        },
-      });
-    }
-  }
-
-  function handleDeleteTaskSuccess(taskId) {
-    // Handle success, e.g., remove the task from the UI
-      // Remove the deleted task from the list
-      $('li[task-id="' + taskId + '"]').remove();
-      $('#editModal'+taskId).remove();
-  }
-
-  function handleEditTask(form) {
-    var taskId = form.attr('action').split('/').pop();
-    $.ajax({
-      url: form.attr('action'),
-      type: form.attr('method'),
-      data: form.serialize(),
-      success: function(data) {
-        handleEditTaskSuccess(taskId, data);
-      },
-      error: function(data) {
-        let errors = data.responseJSON.errors;
-        let result = ''; // Initialize result as an empty string
-
-        for (const key in errors) {
-            result = result.concat(`${errors[key]}\n`);
+            $('#form').on('submit', function (event) {
+                event.preventDefault();
+                handleEditTask($(this));
+            });
         }
-        alert(result);
-      }
-    });
-  }
 
-  function handleEditTaskSuccess(taskId, data) {
-    alert('Updated task successfully');
-    $('#editModal' + taskId).modal('hide');
-    updateTask(taskId, data.data);
-  }
+        function setDefaultStartDate() {
+            // Get the current date and time
+            var now = new Date();
 
-  function getStatusBadgeColor(data) {
-    var bg;
-    if (data.status == 1) {
-      bg = 'primary'
-    } else if(data.status == 2) {
-      bg = 'warning'
-    }else {
-      bg = 'success'
-    }
-    return bg;
-  }
+            // Get the time zone offset in minutes
+            var timeZoneOffset = now.getTimezoneOffset();
 
-  function updateTask(taskId, data) {
-    // console.log(data)
-    var taskItem = $('li[task-id="' + taskId + '"]');
-    taskItem.find('h5.mb-1').text(data.name);
-    
+            // Calculate the adjusted date and time
+            var adjustedDate = new Date(now.getTime() - timeZoneOffset * 60000);
 
-    taskItem.find('.mb-1 span').removeClass().addClass('badge bg-' + getStatusBadgeColor(data)).text(getStatusLabel(data.status));
-    taskItem.find('small.text-muted').eq(0).text('Start Date: ' + formatDateTime(data.start_date));
-    taskItem.find('small.text-muted').eq(1).text('End Date: ' + formatDateTime(data.end_date));
-  }
+            // Format the adjusted date and time to match the input format
+            var formattedDate = adjustedDate.toISOString().slice(0, 16);
 
-  function formatDateTime(dateTimeString) {
-    var options = {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: 'numeric',
-        hour12: true,
-    };
+            // Set the default value for start_date to the adjusted date and time
+            $('#taskStartDate').val(formattedDate);
+        }
 
-    var formattedDate = new Date(dateTimeString).toLocaleDateString('en-US', options);
-    return formattedDate.replace(',', ''); // Remove the comma after the day
-  }
-  
-  function getStatusLabel(status) {
-    let result;
-    if (status == 1) {
-      result = 'To do'
-    }
-    else if (status == 2) {
-      result = 'In Progress'
-    }
-    else {
-      result = 'Completed'
-    }
-    return result;
-  }
-</script>
+        function handleCreateTask(form) {
+            $.ajax({
+                url: form.attr('action'),
+                type: form.attr('method'),
+                data: form.serialize(),
+                success: function (data) {
+                    handleCreateTaskSuccess(data);
+                    for (const key in data) {
+                        if (data.hasOwnProperty.call(data, key)) {
+                            const element = data[key];
+                            {#console.log(element);#}
+                        }
+                    }
+                },
+                error: function (data) {
+                    let errors = data.responseJSON.errors;
+                    let result = ''; // Initialize result as an empty string
+
+                    for (const key in errors) {
+                        result = result.concat(`${errors[key]}\n`);
+                    }
+
+                    alert(result);
+                }
+            });
+        }
+
+        function handleCreateTaskSuccess(data) {
+            alert('Created task successfully');
+            $('.delete-task').off()
+            $('.edit-task').off()
+            $('#form').off()
+            createTaskItem(data.data);
+            $('.delete-task').on('click', function (e) {
+                e.preventDefault();
+                handleDeleteTask($(this).data('task-id'));
+            });
+            $('.edit-task').on('click', function (event) {
+                event.preventDefault();
+                fillForm($(this).data('task-id'))
+            });
+
+            $('#form').on('submit', function (event) {
+                event.preventDefault();
+                handleEditTask($(this));
+            });
+            clearForm();
+        }
+
+        function clearForm() {
+            // Use jQuery to select and clear the form input values
+            $('#taskName').val('');
+            $('#taskStatus').val('1'); // Set the default status value (To do)
+            setDefaultStartDate();
+            $('#taskEndDate').val('');
+        }
+
+        function createTaskItem(task) {
+
+
+            var taskList = $('ul.list-group');
+            var newTaskItem = $('<li></li>').addClass('list-group-item d-flex justify-content-between align-items-center').attr('task-id', task.id);
+
+            newTaskItem.append(`
+        <div>
+            <h5 class="mb-1">${task.name}</h5>
+            <p class="mb-1"><span class="badge bg-${getStatusBadgeColor(task.status)}">${getStatusLabel(task.status)}</span></p>
+            <small class="text-muted">Start Date: ${formatDateTime(task.start_date)}</small>
+            <br /><small class="text-muted">End Date: ${formatDateTime(task.end_date)}</small>
+        </div>
+        <div>
+            <button type="button" class="btn btn-danger btn-sm me-2 delete-task" data-task-id="${task.id}">Delete</button>
+            <button type="button" class="btn btn-primary btn-sm edit-task" data-bs-toggle="modal" data-bs-target="#editModal" data-task-id="${task.id}">Edit</button>
+        </div>
+    `);
+
+            newTaskItem.appendTo(taskList);
+
+        }
+
+
+        function handleDeleteTask(taskId) {
+            // Show confirmation dialog
+            if (confirm('Are you sure you want to delete this task?')) {
+                // If user confirms, send Ajax request to delete the task
+                $.ajax({
+                    type: 'POST',
+                    url: '{% url "todo:delete" 0 %}'.replace('0', taskId),
+                    data: {
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function (data) {
+                        handleDeleteTaskSuccess(taskId);
+                    },
+                    error: function (data) {
+                        let errors = data.responseJSON.errors;
+                        let result = ''; // Initialize result as an empty string
+
+                        for (const key in errors) {
+                            result = result.concat(`${errors[key]}\n`);
+                        }
+                        alert(result);
+                    },
+                });
+            }
+        }
+
+        function handleDeleteTaskSuccess(taskId) {
+            // Handle success, e.g., remove the task from the UI
+            // Remove the deleted task from the list
+            $('li[task-id="' + taskId + '"]').remove();
+            $('#editModal' + taskId).remove();
+        }
+
+        function handleEditTask(form) {
+            var taskId = form.attr('action').split('/').pop();
+            $.ajax({
+                url: form.attr('action'),
+                type: form.attr('method'),
+                data: form.serialize(),
+                success: function (data) {
+                    handleEditTaskSuccess(taskId, data);
+                },
+                error: function (data) {
+                    let errors = data.responseJSON.errors;
+                    let result = ''; // Initialize result as an empty string
+
+                    for (const key in errors) {
+                        result = result.concat(`${errors[key]}\n`);
+                    }
+                    alert(result);
+                }
+            });
+        }
+
+        function handleEditTaskSuccess(taskId, data) {
+            alert('Updated task successfully');
+            $('#editModal').modal('hide');
+            updateTask(taskId, data.data);
+        }
+
+        function getStatusBadgeColor(status) {
+            var bg;
+            if (status == 1) {
+                bg = 'primary'
+            } else if (status == 2) {
+                bg = 'warning'
+            } else {
+                bg = 'success'
+            }
+            return bg;
+        }
+
+        function updateTask(taskId, data) {
+            // console.log(data)
+            var taskItem = $('li[task-id="' + taskId + '"]');
+            taskItem.find('h5.mb-1').text(data.name);
+
+
+            taskItem.find('.mb-1 span').removeClass().addClass('badge bg-' + getStatusBadgeColor(data.status)).text(getStatusLabel(data.status));
+            taskItem.find('small.text-muted').eq(0).text('Start Date: ' + formatDateTime(data.start_date));
+            taskItem.find('small.text-muted').eq(1).text('End Date: ' + formatDateTime(data.end_date));
+        }
+
+        function formatDateTime(dateTimeString) {
+            var options = {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: 'numeric',
+                hour12: true,
+            };
+
+            var formattedDate = new Date(dateTimeString).toLocaleDateString('en-US', options);
+            return formattedDate.replace(',', ''); // Remove the comma after the day
+        }
+
+        function getStatusLabel(status) {
+            let result;
+            if (status == 1) {
+                result = 'To do'
+            } else if (status == 2) {
+                result = 'In Progress'
+            } else {
+                result = 'Completed'
+            }
+            return result;
+        }
+    </script>
 {% endblock %}
